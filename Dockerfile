@@ -1,7 +1,21 @@
-FROM docker.io/eclipse-temurin:19 AS app-env
+FROM docker.io/eclipse-temurin:19 AS build
+COPY . /app
 
 WORKDIR /app
 
-EXPOSE 7000 7001 7002 7003 7004 7010
+RUN ./gradlew -i clean installDist
 
-ENTRYPOINT ["/app/build/install/wsrv2/bin/wsrv2"]
+FROM docker.io/eclipse-temurin:19
+
+
+WORKDIR /app
+
+COPY --from=build /app/build/install/wsrv2 /app/
+
+COPY ./service-matrix.properties /app/service-matrix.properties
+COPY ./signatory.conf /app/signatory.conf
+COPY ./fsStore.conf /app/fsStore.conf
+
+EXPOSE 7000 7001 7002 7003 7004
+
+ENTRYPOINT ["bin/wsrv2"]
