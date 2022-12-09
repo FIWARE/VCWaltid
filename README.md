@@ -30,3 +30,4 @@ Or if you want it to run in the background:
 ```
 docker compose up -d
 ```
+
